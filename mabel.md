@@ -1,7 +1,6 @@
 ---
 title: \textbf{The Mabel Literate Programming Tool}
 subtitle: A Simple Tangler
-author: Kian Dianati
 documentclass: extarticle
 fontsize: 14pt
 geometry: "margin=1in"

@@ -6,8 +6,6 @@ install:
 	sudo cp mabel /usr/bin/mabel
 
 package:
-	mabel mabel.md > src/mabel.go
-	go build src/mabel.go
-	sudo cp mabel /usr/bin/mabel
+	make tangle
 	make install
 	pandoc mabel.md -o mabel.pdf

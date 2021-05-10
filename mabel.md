@@ -30,7 +30,7 @@ import (
 )
 ```
 
-## Dealing with erros
+## Dealing with errors
 
 Since we'll be doing a lot of file i/o, lets make a `check` function that will panic if it recieves an error.
 

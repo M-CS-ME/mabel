@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -6,26 +5,21 @@ import (
 	"bufio"
 	"fmt"
 )
-
-
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
-
-
 func tangle(in string) {
 	file, err := os.Open(in)
 	check(err)
 	f := bufio.NewScanner(file)
 	var open bool = false
-	for i := 0; f.Scan(); i++ {
+	for f.Scan() {
 		ln := f.Text()
 		if len(ln) >= 3 {
 			if ln[:3] == "```" {
 				open = !open
-				fmt.Println()
 				continue
 			}
 		}
@@ -34,8 +28,6 @@ func tangle(in string) {
 		}
 	}
 }
-
-
 func main() {
 	if len(os.Args) > 1 {
 		for _, i := range os.Args[1:] {
@@ -47,4 +39,3 @@ func main() {
 		tangle(file)
 	}
 }
-

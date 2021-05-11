@@ -52,12 +52,11 @@ func tangle(in string) {
 	check(err)
 	f := bufio.NewScanner(file)
 	var open bool = false
-	for i := 0; f.Scan(); i++ {
+	for f.Scan() {
 		ln := f.Text()
 		if len(ln) >= 3 {
 			if ln[:3] == "```" {
 				open = !open
-				fmt.Println()
 				continue
 			}
 		}

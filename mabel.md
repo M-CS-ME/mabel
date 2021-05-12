@@ -18,7 +18,7 @@ The source in `src/mabel.go` is generated with `mabel` through `mabel mabel.md >
 
 ## Imports and packages
 
-I let the package name be `main` for now. For this file we will need the `os`, `bufio`, and `fmt` packages from the stdlib.
+I let the package name be `main` for now. For this file we will need the `os`, `bufio`, `strconv`, and `fmt` packages from the stdlib.
 
 ```go
 package main
@@ -27,6 +27,7 @@ import (
 	"os"
 	"bufio"
 	"fmt"
+	"strconv"
 )
 ```
 
@@ -42,50 +43,92 @@ func check(e error) {
 }
 ```
 
-## Tangling
+## Tangling Specific Source Blocks
 
-This is still an early implmentation and so doesn't have all the features I want. For now it looks through the code, and if it's in a code block (determined by the `open` boolean) it will print the line into stdout which then could be piped into a file.
+The whole reason I started this project was so I could run code snippets from inside a text file. So I need to be able to tangle a specific source block.
+
+### Finding Source Blocks
+
+Because I want to be able to print a specific source block, I first need to find where those source blocks are. So I want this function to return two arrays specifying the lines where source blocks begin `bg []int` and where they end `en []int`. Basically if a source block just opened, append the line number to `bg` and if it just closed append the line number to `en`. 
 
 ```go
-func tangle(in string) {
-	file, err := os.Open(in)
+func srcblks(filename string) (bg, en []int) {
+	file, err := os.Open(filename)
 	check(err)
-	f := bufio.NewScanner(file)
+	in := bufio.NewScanner(file)
 	var open bool = false
-	for f.Scan() {
-		ln := f.Text()
+	for i := 0; in.Scan(); i++ {
+		ln := in.Text()
 		if len(ln) >= 3 {
 			if ln[:3] == "```" {
 				open = !open
-				continue
+				if open {
+					bg = append(bg, i)
+				} else {
+					en = append(en, i)
+				}
 			}
 		}
-		if open {
-			fmt.Println(ln)
+	}
+	return
+}
+```
+
+### Writing Parts of A Buffer to Stdout
+
+Write the `bg`th to `en`th elements of a buffer to stdout
+
+```go
+func write(buf []string, bg, en int) {
+	for _, i := range buf[bg+1:en] {
+		fmt.Println(i)
+	}
+}
+```
+
+### Tangling Specific and General Ones
+
+Basically, if `blk` is `-1` tangle the entire buffer, if not tangle the `blk`th source block.
+
+```go
+func tangle(in string, blk int) {
+	file, err := os.Open(in)
+	check(err)
+	f := bufio.NewScanner(file)
+	bg, en := srcblks(in)
+	var buf []string
+	for f.Scan() {
+		buf = append(buf, f.Text())
+	}
+	if blk == -1 {
+		for i := 0; i < len(bg); i++ {
+			write(buf, bg[i], en[i])
 		}
+	} else {
+		write(buf, bg[blk], en[blk])
 	}
 }
 ```
 
 ## Main and dealing with input
 
-For now just tangle all argument given to it, or if no arguments are given, take one from stdin.
+Implement an user interface using command line args for the `tangle` function.
 
 ```go
 func main() {
-	if len(os.Args) > 1 {
-		for _, i := range os.Args[1:] {
-			tangle(i)
-		}
+	if len(os.Args) > 2 {
+		blk, _ := strconv.Atoi(os.Args[2])
+		tangle(os.Args[1], blk)
+	} else if len(os.Args) > 1 {
+		tangle(os.Args[1], -1)
 	} else {
-		var file string
-		fmt.Scan(&file)
-		tangle(file)
+		fmt.Println("error: no input files")
 	}
 }
 ```
 
 ## What's next?
-
-- [ ] Add concurency for speed 
-- [ ] Ability to execute/print to stdout a selected group of code blocks (like `org-babel`)
+- [X] Ability to print to stdout a selected group of code blocks (like `org-babel`).
+- [ ] Add concurency for speed. 
+- [ ] Add a way to compile/run a specific code block and write the output in a file.
+- [ ] Add a way to configure specific compilers/interpreters through a text file.

@@ -21,9 +21,9 @@ $ sudo make install
 
 `mabel` prints the source blocks into stdout, therefore to write to a file just do `mabel src.md > src`.
 
-The syntax is the same as markdown, only code blocks are counted and in-line code is ignored.
+To specify a specific source block `n` just do `mabel src.md n`
 
-If no input is given, `mabel` will take input through stdin.
+The syntax is the same as markdown, only code blocks are counted and in-line code is ignored.
 
 ## What's next?
 

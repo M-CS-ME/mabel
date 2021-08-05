@@ -29,5 +29,5 @@ The syntax is the same as markdown, only code blocks are counted and in-line cod
 
 - [X] Ability to print to stdout a selected group of code blocks (like `org-babel`)
 - [ ] Add concurency for speed 
-- [ ] Ability to run a specific code block and write to output to a file (either through pipe or buf)
+- [X] Ability to run a specific code block and write to output to a file (either through pipe or buf)
 - [ ] Configuring specific compilers and interpreters.
